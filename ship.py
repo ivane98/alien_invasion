@@ -14,12 +14,15 @@ class Ship:
         self.move_left = False
 
     def update(self):
-        if self.move_right:
+        if self.move_right and self.rect.right < self.screen_rect.right:
             self.x += self.settings.ship_speed
-        elif self.move_left:
+        elif self.move_left and self.rect.left > 0:
             self.x -= self.settings.ship_speed
+        
+        
 
         self.rect.x = self.x
+        
 
     def blitme(self):
         self.screen.blit(self.image, self.rect)
