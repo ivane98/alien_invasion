@@ -24,7 +24,7 @@ class AlienInvasion:
 
         self._create_fleet()
 
-        self.button = Button(self, 'Play')
+        self.play_button = Button(self, 'Play')
 
     def run_game(self):
         while True:
@@ -44,6 +44,29 @@ class AlienInvasion:
                     self._check_keydown_events(event)
                 elif event.type == pygame.KEYUP:
                     self._check_keyup_events(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+
+        if button_clicked and not self.stats.game_active:
+            self.settings.initialize_dynamic_settings()
+            self._start_game()
+            
+
+    def _start_game(self):
+        self.stats.reset_stats()
+        self.stats.game_active = True
+
+        self.bullets.empty()
+        self.aliens.empty()
+
+        self._create_fleet()
+        self.ship.center_ship()
+
+        pygame.mouse.set_visible(False)
 
     def _check_keydown_events(self, event):
         if event.key == pygame.K_RIGHT:
@@ -52,6 +75,8 @@ class AlienInvasion:
             self.ship.move_left = True
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
+        elif event.key == pygame.K_p:
+            self._start_game()
         elif event.key == pygame.K_q:
             sys.exit()
 
@@ -97,7 +122,7 @@ class AlienInvasion:
         self.aliens.draw(self.screen)
 
         if not self.stats.game_active:
-            self.button.draw_button()
+            self.play_button.draw_button()
 
             
         pygame.display.flip()
@@ -118,6 +143,7 @@ class AlienInvasion:
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
 
 
     def _check_fleet_edges(self):
@@ -155,6 +181,7 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.stats.game_active = False
+            pygame.mouse.set_visible(True)
 
     def _check_aliens_bottom(self):
         screen_rect = self.screen.get_rect()
